@@ -1,0 +1,35 @@
+# POD/deploy 생성
+- ### 명령어 기반 vs YAML File 기반 2가지 가능
+- ### kc create deployment nginx01 --image=nginx
+: POD 확인
+
+spkr@erdia22:~$ kc get pod -o wide
+NAME                                READY   STATUS    RESTARTS   AGE   IP             NODE    NOMINATED NODE   READINESS GATES
+busybox                             1/1     Running   0          75m   10.10.100.14   dia04   <none>           <none>
+nginx-deployment-7b758584f7-ftvnm   1/1     Running   0          19h   10.10.100.18   dia04   <none>           <none>
+nginx01-6bdf767788-shrvt            1/1     Running   0          14s   10.10.100.20   dia04   <none>           <none>
+
+POD 50개 생성 예제
+: 간단히 명령어 1줄로 50개 POD(Application) 실행 가능
+spkr@erdia22:~$ kc scale deployment nginx01 --replicas=50
+deployment.extensions/nginx01 scaled
+
+: 총 설치 소요 시간 약 700s 이내 소요
+: 일반 VM 환경 시 최소 10분 이상 소요(VM 이미지 파일 import 혹은 VM OS 설치 모두)
+
+각 Node 별 POD 균등 분배 확인
+: 전체 50개 POD가 개별 Node에 12~13개씩 균등하게 분배됨 
+spkr@erdia22:~$ kc get pod -o wide|grep dia01|wc -l
+12
+spkr@erdia22:~$ kc get pod -o wide|grep dia02|wc -l
+12
+spkr@erdia22:~$ kc get pod -o wide|grep dia03|wc -l
+13
+spkr@erdia22:~$ kc get pod -o wide|grep dia04|wc -l
+13
+
+POD Scale Down
+: 50개 -> 3개 Scale Down 약 30s 이내 소요 
+spkr@erdia22:~$ kc scale deployment nginx01 --replicas=3
+deployment.extensions/nginx01 scaled
+

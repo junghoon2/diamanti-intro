@@ -1,0 +1,35 @@
+k8s 핵심 컨셉으로 Desired State가 있습니다. 클러스터는 자동으로 항상 원하는 상태(desired state)를 유지하는 기능입니다. 
+해당 기능을 Demo를 통하여 검증해 보겠습니다.
+
+POD 삭제
+. 현재 Deployment 상태(desired state) 확인 - 3개 POD 실행
+spkr@erdia22:~$ kc get deployments. nginx01
+NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+nginx01   3/3     3            3           17m
+
+. 기존 Deployment 실행 중인 POD 삭제
+spkr@erdia22:~$ kc get pod
+NAME                                READY   STATUS    RESTARTS   AGE
+busybox                             1/1     Running   0          83m
+nginx-deployment-7b758584f7-ftvnm   1/1     Running   0          19h
+nginx01-6bdf767788-8rxtg            1/1     Running   0          6m26s
+nginx01-6bdf767788-djs8v            1/1     Running   0          6m26s
+nginx01-6bdf767788-shrvt            1/1     Running   0          7m58s
+
+spkr@erdia22:~$ kc delete pod nginx01-6bdf767788-8rxtg
+pod "nginx01-6bdf767788-8rxtg" deleted
+
+. 기존 POD 삭제되고 신규 POD가 자동으로 생성됨
+. 신규 생성 POD(nginx01-6bdf767788-2nk47), 시작 시간 18s 확인 가능 
+spkr@erdia22:~$ kc get pod
+NAME                                READY   STATUS    RESTARTS   AGE
+busybox                             1/1     Running   0          90m
+nginx-deployment-7b758584f7-ftvnm   1/1     Running   0          19h
+nginx01-6bdf767788-2nk47            1/1     Running   0          18s
+nginx01-6bdf767788-djs8v            1/1     Running   0          14m
+nginx01-6bdf767788-shrvt            1/1     Running   0          15m
+
+. 선언된 Deployment 상태(3개 POD)와 동일하게 POD를 삭제하여도 자동으로 POD 3개를 유지함 
+spkr@erdia22:~$ kc get deployments. nginx01
+NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+nginx01   3/3     3            3           17m

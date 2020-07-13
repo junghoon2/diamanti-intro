@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment01
+  namespace: test
+  labels:
+    run: web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      run: web
+  template:
+    metadata:
+      labels:
+        run: web
+    spec:
+      containers:
+      - name: nginxhello
+        image: nginxdemos/hello
